@@ -1,0 +1,29 @@
+name: App Workflow
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-test-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v3
+
+      - name: Configurar herramientas
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y make
+
+      - name: Ejecutar pruebas (si existieran)
+        run: |
+          echo "No hay pruebas definidas todavía"
+
+      - name: Ejecutar linter (si existiera)
+        run: |
+          echo "No hay linter definido todavía"
