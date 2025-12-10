@@ -8,22 +8,41 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-test-lint:
+  build-test-lint-security:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout del repositorio
         uses: actions/checkout@v3
 
-      - name: Configurar herramientas
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y make
+      - name: Setup Node.js with cache
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
 
-      - name: Ejecutar pruebas (si existieran)
-        run: |
-          echo "No hay pruebas definidas todavía"
+      - name: Install dependencies
+        run: npm install
 
-      - name: Ejecutar linter (si existiera)
+      - name: Run linter if exists
         run: |
-          echo "No hay linter definido todavía"
+          if npm run | grep -q "lint"; then
+            npm run lint
+          else
+            echo "No hay linter definido."
+          fi
+
+      - name: Run tests if exists
+        run: |
+          if npm run | grep -q "test"; then
+            npm test
+          else
+            echo "No hay pruebas definidas."
+          fi
+
+      - name: Snyk security scan
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: test
